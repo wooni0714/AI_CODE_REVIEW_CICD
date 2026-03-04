@@ -15,7 +15,7 @@ import wooni.cicd.ai_review.webhook.service.WebhookService;
 @RequiredArgsConstructor
 public class GitHubWebhookController {
     private final WebhookService webhookService;
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
     @PostMapping("/github")
     public ResponseEntity<String> createGitHubWebhook(@RequestHeader("X-Hub-Signature-256") String signature,
