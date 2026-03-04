@@ -18,9 +18,6 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class GitHubApiService {
-    private static final String PR_COMMENTS_URL    = "/repos/{repo}/pulls/{prNumber}/comments";
-    private static final String ISSUE_COMMENTS_URL = "/repos/{repo}/issues/{prNumber}/comments";
-
     private final WebClient githubWebClient;
 
     public Mono<List<DiffFile>> getPrFiles(String repo, int prNumber) {
@@ -86,7 +83,10 @@ public class GitHubApiService {
         );
 
         return githubWebClient.post()
-                .uri(PR_COMMENTS_URL, repo, prNumber)
+                .uri(uriBuilder -> uriBuilder
+                        .path("/repos/" + repo + "/pulls/" + prNumber + "/comments")
+                        .build()
+                )
                 .bodyValue(request)
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, response ->
@@ -116,7 +116,10 @@ public class GitHubApiService {
         String body = "##AI 코드 리뷰 결과\n\n" + summary;
 
         return githubWebClient.post()
-                .uri(ISSUE_COMMENTS_URL, repo, prNumber)
+                .uri(uriBuilder -> uriBuilder
+                        .path("/repos/" + repo + "/issues/" + prNumber + "/comments")
+                        .build()
+                )
                 .bodyValue(Map.of("body", body))
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, response ->
