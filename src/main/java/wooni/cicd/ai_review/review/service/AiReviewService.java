@@ -141,7 +141,7 @@ public class AiReviewService {
             규칙:
             - 문제가 없으면 reviews는 []로 두고 summary만 작성하세요.
             - comment/suggestion은 반드시 구체적으로 작성하세요(근거 없는 추상적 표현 금지).
-            """.formatted(diffFile.fileName(), diffFile.status(), diffFile.patch());
+            """.formatted(diffFile.fileName(), diffFile.patch());
     }
 
     private Map<String, Object> buildRequest(String prompt) {
