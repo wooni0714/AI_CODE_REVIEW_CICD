@@ -47,7 +47,7 @@ public class GitHubApiService {
 
                     for (JsonNode file : files) {
                         collected.add(new DiffFile(
-                                file.get("fileName").asText(),
+                                file.get("filename").asText(),
                                 file.has("patch") ? file.get("patch").asText() : null,
                                 file.get("status").asText()
                         ));
