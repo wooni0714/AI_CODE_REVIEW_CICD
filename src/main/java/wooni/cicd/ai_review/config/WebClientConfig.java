@@ -23,7 +23,7 @@ public class WebClientConfig {
     private static final int READ_TIMEOUT_SECONDS = 60;
     private static final int WRITE_TIMEOUT_SECONDS = 10;
 
-    private ReviewProperties reviewProperties;
+    private final ReviewProperties reviewProperties;
 
     @Bean
     public WebClient githubWebClient() {
