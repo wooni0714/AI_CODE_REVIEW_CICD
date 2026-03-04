@@ -1,0 +1,70 @@
+name: Deploy to GCP
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 체크아웃
+        uses: actions/checkout@v4
+
+      - name: JDK 17 설정
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: gradlew 실행 권한 부여
+        run: chmod +x gradlew
+
+      - name: 테스트 실행
+        run: ./gradlew test --no-daemon
+
+      - name: Docker Hub 로그인
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Docker 이미지 빌드 및 푸시
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/ai-reviewer:latest
+
+      - name: CI/docker-compose.yml GCP 전송
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.GCP_HOST }}
+          username: ${{ secrets.GCP_USERNAME }}
+          key: ${{ secrets.GCP_SSH_KEY }}
+          source: "CI/docker-compose.yml"
+          target: "/home/${{ secrets.GCP_USERNAME }}/ai-reviewer"
+
+      - name: GCP 배포
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.GCP_HOST }}
+          username: ${{ secrets.GCP_USERNAME }}
+          key: ${{ secrets.GCP_SSH_KEY }}
+          script: |
+            set -e
+            mkdir -p /home/${{ secrets.GCP_USERNAME }}/ai-reviewer
+            cd /home/${{ secrets.GCP_USERNAME }}/ai-reviewer
+            cat > .env << 'EOF'
+            GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
+            GITHUB_TOKEN=${{ secrets.GH_TOKEN_DEPLOY }}
+            WEBHOOK_SECRET=${{ secrets.WEBHOOK_SECRET }}
+            DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
+            REDIS_HOST=redis
+            REDIS_PORT=6379
+            EOF
+            echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+            docker compose -f CI/docker-compose.yml --env-file .env pull
+            docker compose -f CI/docker-compose.yml --env-file .env up -d --remove-orphans
+            docker image prune -f
