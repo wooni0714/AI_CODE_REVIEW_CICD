@@ -27,7 +27,7 @@ public class WebhookService {
         validateSignature(signature, rawBody);
 
         String action = payload.action();
-        if (REVIEW_ACTIONS.contains(action)) {
+        if (!REVIEW_ACTIONS.contains(action)) {
             log.info("리뷰 대상 아님 {}", action);
             return;
         }
