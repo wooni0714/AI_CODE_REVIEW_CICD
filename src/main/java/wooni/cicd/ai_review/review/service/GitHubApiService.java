@@ -18,7 +18,6 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class GitHubApiService {
-    private static final String PR_FILES_URL       = "/repos/{repo}/pulls/{prNumber}/files?per_page=100&page={page}";
     private static final String PR_COMMENTS_URL    = "/repos/{repo}/pulls/{prNumber}/comments";
     private static final String ISSUE_COMMENTS_URL = "/repos/{repo}/issues/{prNumber}/comments";
 
@@ -30,7 +29,12 @@ public class GitHubApiService {
 
     private Mono<List<DiffFile>> fetchAllPages(String repo, int prNumber, int page, List<DiffFile> collected) {
         return githubWebClient.get()
-                .uri(PR_FILES_URL, repo, prNumber, page)
+                .uri(uriBuilder -> uriBuilder
+                        .path("/repos/" + repo + "/pulls/" + prNumber + "/files")
+                        .queryParam("per_page", 100)
+                        .queryParam("page", page)
+                        .build()
+                )
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, response ->
                         response.bodyToMono(String.class)
