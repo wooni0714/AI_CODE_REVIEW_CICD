@@ -14,10 +14,12 @@ public class ReviewFilter {
             "build/"
     );
 
-    private static final List<String> EXCLUDE_FILENAMES =  List.of(
-            "Application.java",
+    private static final List<String> EXCLUDE_FILENAME_SUFFIXES =  List.of(
+            "AiReviewerApplication.java",
+            "ReviewProperties.java",
+            "WebClientConfig.java",
             "Config.java",
-            "Const.java"
+            "Application.java"
     );
 
     private static final String QUERYDSL_PREFIX = "/Q";
@@ -42,9 +44,10 @@ public class ReviewFilter {
         }
 
         String simpleFilename = fileName.substring(fileName.lastIndexOf("/") + 1);
-        for (String excludedFileName : EXCLUDE_FILENAMES) {
-            if (simpleFilename.equals(excludedFileName)) {
+        for (String excludedFileName : EXCLUDE_FILENAME_SUFFIXES) {
+            if (simpleFilename.endsWith(excludedFileName)) {
                 log.info("제외 파일명 fileName : {}", fileName);
+                return false;
             }
         }
 
