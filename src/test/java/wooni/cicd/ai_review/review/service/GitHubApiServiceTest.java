@@ -1,5 +1,6 @@
 package wooni.cicd.ai_review.review.service;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
+@Disabled("실제 GitHub API 호출 - 로컬에서만 실행")
 class GitHubApiServiceTest {
     @Autowired
     private GitHubApiService gitHubApiService;
