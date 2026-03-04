@@ -54,9 +54,9 @@ jobs:
           key: ${{ secrets.GCP_SSH_KEY }}
           script: |
             set -e
-            mkdir -p /home/${{ secrets.GCP_USERNAME }}/ai-reviewer
+            mkdir -p /home/${{ secrets.GCP_USERNAME }}/ai-reviewer/CI
             cd /home/${{ secrets.GCP_USERNAME }}/ai-reviewer
-            cat > .env << 'EOF'
+            cat > CI/.env << 'EOF'
             GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
             GITHUB_TOKEN=${{ secrets.GH_TOKEN_DEPLOY }}
             WEBHOOK_SECRET=${{ secrets.WEBHOOK_SECRET }}
@@ -65,6 +65,6 @@ jobs:
             REDIS_PORT=6379
             EOF
             echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-            docker compose -f CI/docker-compose.yml --env-file .env pull
-            docker compose -f CI/docker-compose.yml --env-file .env up -d --remove-orphans
+            docker compose -f CI/docker-compose.yml pull
+            docker compose -f CI/docker-compose.yml up -d --remove-orphans
             docker image prune -f
