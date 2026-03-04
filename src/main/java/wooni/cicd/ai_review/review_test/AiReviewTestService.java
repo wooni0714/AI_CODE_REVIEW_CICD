@@ -1,11 +1,13 @@
 package wooni.cicd.ai_review.review_test;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.catalina.User;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 public class AiReviewTestService {
 
     public String getDisplayName(User user) {
