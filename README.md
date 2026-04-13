@@ -2,9 +2,18 @@
 
  ### 프로젝트 소개
  - GitHub PR 생성 시 AI가 자동으로 코드를 리뷰하고 PR 코멘트를 등록하는 시스템
+ - Java 앱 서버와 Python AI 서버로 분리
+
+### 관련 레포지토리
+| 레포 | 역할 |
+|------|------|
+| [AI_CODE_REVIEW_CICD](https://github.com/wooni0714/AI_CODE_REVIEW_CICD) | Java Spring Boot 서버 (웹훅, GitHub API) |
+| [AI-ASSISTANT](https://github.com/wooni0714/ai-assistant) | Python FastAPI AI 서버 (RAG, LLM, 에이전트) |
+
 
 ### 개발 환경
 
+**Java 서버**
 - Language : Java 17
 - Framework : Spring Boot 3.5
 - Build : Gradle 8
@@ -12,6 +21,15 @@
 - CI/CD : GitHub Actions
 - Infra : GCP, Docker, Docker Compose
 - Webhook : GitHub Webhook
+
+**Python AI 서버**
+- Language: Python 3.12
+- Framework: FastAPI
+- Agent: LangGraph
+- AI: Google Gemini API
+- Vector DB: ChromaDB
+- Cache: Redis
+- Infra: GCP, Docker, Docker Compose
 
 
 ### 데이터 시퀀스 다이어그램
@@ -32,7 +50,7 @@ src/main/java/wooni/cicd/ai_review/
 │   │   └── ReviewResult.java       # AI 리뷰 전체 응답
 │   ├── service/
 │   │   ├── GitHubApiService.java   # GitHub API 호출 (파일 조회, 코멘트 등록)
-│   │   ├── AiReviewService.java    # Gemini AI 코드 리뷰 요청
+│   │   ├── AiReviewService.java    ## Python AI 서버 호출하여 AI 코드 리뷰 요청
 │   │   └── CodeReviewService.java  # 리뷰 파이프라인
 │   └── util/
 │       └── ReviewFilter.java       # 리뷰 대상 파일 필터링
@@ -64,10 +82,9 @@ CI/
 ```java
 @ConfigurationProperties(prefix = "review")
 public record ReviewProperties(
-    String apiKey,
     String githubToken,
     String webhookSecret,
-    String aiModel,
+    String pythonAiUrl,
     int maxRetry,
     long reviewedCommitTtl
 )
@@ -82,8 +99,8 @@ public record ReviewProperties(
 - **githubWebClient**: GitHub API 호출용
   - `Authorization: Bearer {token}` 헤더 자동 주입
   - `Accept: application/vnd.github.v3+json` 헤더 설정
-- **geminiWebClient**: Gemini API 호출용
-  - API 키는 쿼리 파라미터로 전달
+- **pythonAiWebClient**: Python AI 서버 호출용
+  - `Content-Type: application/json` 헤더 설정
 - 공통 타임아웃 설정 (connect 30초, read 60초, write 10초)
 
 ---
@@ -155,17 +172,12 @@ GitHub API 호출만 담당 (단일 책임 원칙)
 ---
 
 #### `AiReviewService.java`
-Gemini AI API 호출 및 응답 파싱 담당
-
-| 메서드 | 설명 |
-|--------|------|
-| `review()` | 파일별 AI 리뷰 요청 |
-| `buildPrompt()` | 리뷰 프롬프트 생성 (파일명 + patch) |
-| `parseReviewResult()` | Gemini 응답 JSON 파싱 |
-| `emptyResult()` | 파싱 실패 시 빈 리뷰 반환 |
-
-- **재시도**: 최대 3회, 지수 백오프 (2초 시작), 4xx는 재시도 제외
-- **마크다운 제거**: Gemini가 간혹 ` ```json ``` ` 코드블록으로 응답 → 제거 후 파싱
+- **githubWebClient**: GitHub API 호출용
+  - `Authorization: Bearer {token}` 헤더 자동 주입
+  - `Accept: application/vnd.github.v3+json` 헤더 설정
+- **pythonAiWebClient**: Python AI 서버 호출용
+  - `Content-Type: application/json` 헤더 설정
+- 공통 타임아웃 설정 (connect 30초, read 60초, write 10초)
 
 ---
 
