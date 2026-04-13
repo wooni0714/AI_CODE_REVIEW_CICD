@@ -31,8 +31,4 @@ public class AiReviewTestService {
         }
         return emails;
     }
-
-    private User findById(String id) {
-        return null;
-    }
 }
