@@ -26,6 +26,7 @@ public class AiReviewTestService {
         List<String> emails = new ArrayList<>();
         for (String id : userIds) {
             User user = findById(id);
+            assert user != null;
             emails.add(user.getUsername());
         }
         return emails;
