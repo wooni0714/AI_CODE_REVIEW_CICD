@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class WebClientConfig {
     private static final String GITHUB_API_URL = "https://api.github.com";
-    private static final String GEMINI_API_URL = "https://generativelanguage.googleapis.com";
+    private static final String PYTHON_AI_URL = "http://python-ai:8000";
 
     private static final int CONNECT_TIMEOUT_SECONDS = 30;
     private static final int READ_TIMEOUT_SECONDS = 60;
@@ -36,9 +36,9 @@ public class WebClientConfig {
     }
 
     @Bean
-    public WebClient geminiWebClient() {
+    public WebClient pythonAiWebClient() {
         return WebClient.builder()
-                .baseUrl(GEMINI_API_URL)
+                .baseUrl(PYTHON_AI_URL)
                 .defaultHeader("Content-Type", "application/json")
                 .clientConnector(new ReactorClientHttpConnector(buildHttpClient()))
                 .build();
