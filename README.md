@@ -2,6 +2,8 @@
 
  ### 프로젝트 소개
  - GitHub PR 생성 시 AI가 자동으로 코드를 리뷰하고 PR 코멘트를 등록하는 시스템
+ - 과거 PR 패턴 기반 RAG 검색으로 프로젝트 리뷰
+ - 이슈 내용 기반으로 해당 기능의 담당자 조회 및 추천
  - Java 앱 서버와 Python AI 서버로 분리
 
 ### 관련 레포지토리
@@ -33,7 +35,7 @@
 
 
 ### 데이터 시퀀스 다이어그램
-<img width="7550" height="6605" alt="Image" src="https://github.com/user-attachments/assets/dab3fb68-63a5-4771-8ca7-5a20b8b695bd" />
+<img width="6735" height="7515" alt="Image" src="https://github.com/user-attachments/assets/dcaa7b60-dc14-48d3-bb1c-37cb5d14ce48" />
 
 ### 프로젝트 구조
 
@@ -72,9 +74,20 @@ CI/
 └── deploy.yml                      # GitHub Actions CI/CD
 ```
 
-### 결과
+### AI 자동 코드 리뷰 결과
 <img width="731" height="865" alt="Image" src="https://github.com/user-attachments/assets/e9f3621f-8c27-4259-8661-33030cade268" />
 
+### 기능 담당자 AI 추천 결과
+<img width="830" height="131" alt="Image" src="https://github.com/user-attachments/assets/dc907160-c5d4-4179-b383-58445613bb70" />
+
+
+### API
+---
+| 엔드포인트 | 메서드 | 설명 |
+|-----------|--------|------|
+| `/webhook/github` | POST | GitHub Webhook 수신 |
+| `/issue/assignee` | POST | 이슈 담당자 추천 |
+---
 ## 클래스별 상세 설명
 ### Config
 
